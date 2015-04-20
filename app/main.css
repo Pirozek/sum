@@ -290,6 +290,17 @@ input.remove,
         z-index:100;
     }
 
+    #nav .ip {
+        position: absolute;
+        left: 100px;
+        top: 100%;
+        color: #CCC;
+        font-size: 0.5em;
+        font-family: sans-serif;
+        margin-top: -15px;
+        z-index:100;
+    }
+
     #nav #rooms-dragger {
         position:absolute;
         width:100%;

@@ -42,21 +42,21 @@ $(document).ready(function() {
     
     
     // load alternative config given by command line?
-    if (gui.App.argv.length > 0) {
-
-        // argument is absolute config file?
-        if (fileExists(gui.App.argv[0])) {
-            $.extend(config, ini.parse(fs.readFileSync(gui.App.argv[0], 'utf-8')));
-        
-        // argument is relative config file?
-        } else if (fileExists(path.dirname(process.execPath) + '/' + gui.App.argv[0])) {
-            $.extend(config, ini.parse(fs.readFileSync(path.dirname(process.execPath) + '/' + gui.App.argv[0], 'utf-8')));
-            
-        // otherwise use argument as username
-        } else {
-            config.username = gui.App.argv[0];
-        }
-    }
+    //if (gui.App.argv.length > 0) {
+    //
+    //    // argument is absolute config file?
+    //    if (fileExists(gui.App.argv[0])) {
+    //        $.extend(config, ini.parse(fs.readFileSync(gui.App.argv[0], 'utf-8')));
+    //
+    //    // argument is relative config file?
+    //    } else if (fileExists(path.dirname(process.execPath) + '/' + gui.App.argv[0])) {
+    //        $.extend(config, ini.parse(fs.readFileSync(path.dirname(process.execPath) + '/' + gui.App.argv[0], 'utf-8')));
+    //
+    //    // otherwise use argument as username
+    //    } else {
+    //        config.username = gui.App.argv[0];
+    //    }
+    //}
 
     // convert int values to int type
     $.each(config, function(key, value) {
@@ -89,6 +89,7 @@ $(document).ready(function() {
         $('#main, #nav').show();
         $('#splash, #login').hide();
         inject('sum-frontend-events').resize();
+        $('#selected-ip').text(backend.ip);
     };
 
     // initialize window position and size

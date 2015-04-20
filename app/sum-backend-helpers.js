@@ -15,9 +15,9 @@ define('sum-backend-helpers', Class.extend({
      * @param userlist (array of object) list with all users (object with property username)
      * @param user (string) username which will be searched
      */
-    getUser: function(userlist, user) {
+    getUser: function (userlist, user) {
         user = user.toLowerCase();
-        for(var i=0; i<userlist.length; i++) {
+        for (var i = 0; i < userlist.length; i++) {
             if (userlist[i].username.toLowerCase() == user) {
                 return userlist[i];
             }
@@ -32,9 +32,9 @@ define('sum-backend-helpers', Class.extend({
      * @param list (array) with objects with property name
      * @param room (string) roomname which should be removed
      */
-    removeRoomFromList: function(list, room) {
+    removeRoomFromList: function (list, room) {
         var newList = [];
-        for(var i=0; i<list.length; i++) {
+        for (var i = 0; i < list.length; i++) {
             if (list[i].name == room)
                 continue;
             newList[newList.length] = list[i];
@@ -49,8 +49,8 @@ define('sum-backend-helpers', Class.extend({
      * @param list (array) with users
      * @param room (string) roomname in which the user should be
      */
-    isUserInRoomList: function(list, room) {
-        for (var i=0; i<list.length; i++) {
+    isUserInRoomList: function (list, room) {
+        for (var i = 0; i < list.length; i++) {
             if (list[i].name == room) {
                 return true;
             }
@@ -65,15 +65,15 @@ define('sum-backend-helpers', Class.extend({
      * @param list (array) with users with property username
      * @param compare (array) with users with property username
      */
-    getUsersNotInListOne: function(list, compare) {
+    getUsersNotInListOne: function (list, compare) {
         var notInList = [];
-        for(var i=0; i<compare.length; i++) {
+        for (var i = 0; i < compare.length; i++) {
             var inList = false;
-            for(var n=0; n<list.length; n++) {
-                if(compare[i].username==list[n].username)
+            for (var n = 0; n < list.length; n++) {
+                if (compare[i].username == list[n].username)
                     inList = true;
             }
-            if (inList===false)
+            if (inList === false)
                 notInList[notInList.length] = compare[i];
         }
         return notInList;
@@ -86,9 +86,9 @@ define('sum-backend-helpers', Class.extend({
      * @param list (array) with users
      * @param status (string) the user status
      */
-    getUsersByStatus: function(list, status) {
+    getUsersByStatus: function (list, status) {
         var usersWithStatus = [];
-        for(var i=0; i<list.length; i++) {
+        for (var i = 0; i < list.length; i++) {
             if (list[i].status === status)
                 usersWithStatus[usersWithStatus.length] = list[i];
         }
@@ -101,8 +101,8 @@ define('sum-backend-helpers', Class.extend({
      * @param userlist (array) unsorted userlist
      * @return (array) sorted userlist
      */
-    sortUserlistByUsername: function(userlist) {
-        return userlist.sort(function(a,b) {
+    sortUserlistByUsername: function (userlist) {
+        return userlist.sort(function (a, b) {
             if (a.username.toLowerCase() < b.username.toLowerCase())
                 return -1;
             if (a.username.toLowerCase() > b.username.toLowerCase())
@@ -118,7 +118,7 @@ define('sum-backend-helpers', Class.extend({
      * @param user (object) userobject
      * @param userinfos (object) additional userinfos
      */
-    mergeUserAndUserinfos: function(user, userinfos) {
+    mergeUserAndUserinfos: function (user, userinfos) {
         user.ip = userinfos.ip;
         user.port = userinfos.port;
         user.key = userinfos.key;
@@ -130,27 +130,43 @@ define('sum-backend-helpers', Class.extend({
         return user;
     },
 
-    
+
     /**
      * returns current ip
      * @return (string|boolean) the ip of the current user
      */
-    getIp: function() {
-        var ifaces=os.networkInterfaces();
+    getIp: function () {
+        var ifaces = os.networkInterfaces();
         var ip = false;
         var excluded = config.excluded_ips.split(',');
+        var preferred = config.preferred_ip.split('.');
+        var matched = false;
         for (var dev in ifaces) {
-            ifaces[dev].forEach(function(details){
-                if (details.family!='IPv4')
+            ifaces[dev].forEach(function (details) {
+                if (details.family != 'IPv4')
                     return;
 
-                for (var i = 0; i<excluded.length; i++) {
-                    if (details.address.indexOf(excluded[i])===0) {
+                for (var i = 0; i < excluded.length; i++) {
+                    if (details.address.indexOf(excluded[i]) === 0) {
                         return;
                     }
                 }
 
-                ip = details.address;
+                if (preferred.length == 4) //because *.*.*.*
+                {
+                    var addr = details.address.split('.');
+                    var match = true;
+                    addr.forEach(function (part, index) {
+                        if (preferred[index] != '*' && part != preferred[index]) match = false;
+                    });
+
+                    if (match) {
+                        ip = details.address;
+                        matched = true;
+                    }
+                }
+
+                if(!matched) ip = details.address;
             });
         }
         return ip;
@@ -161,7 +177,7 @@ define('sum-backend-helpers', Class.extend({
      * returns current systems username
      * @return (string) the username of the current user (from System environment variables)
      */
-    getUsername: function() {
+    getUsername: function () {
         if (typeof config.username == "undefined")
             return (process.env.USER || process.env.USERNAME).toLowerCase();
         else
@@ -175,9 +191,9 @@ define('sum-backend-helpers', Class.extend({
      * @param conversations (array) array with all conversations
      * @param id (string) id of message
      */
-    findMessage: function(conversations, id) {
+    findMessage: function (conversations, id) {
         for (var key in conversations) {
-            for (var i=0; i<conversations[key].length; i++) {
+            for (var i = 0; i < conversations[key].length; i++) {
                 if (conversations[key][i].id == id) {
                     return conversations[key][i];
                 }
@@ -193,8 +209,8 @@ define('sum-backend-helpers', Class.extend({
      * @return (boolean|object) message or false
      * @param conversation (array) array with all conversations
      */
-    getLastNoneSystemMessage: function(conversation) {
-        for(var i=conversation.length-1; i>=0; i--) {
+    getLastNoneSystemMessage: function (conversation) {
+        for (var i = conversation.length - 1; i >= 0; i--) {
             if (typeof conversation[i].type != 'undefined' && conversation[i].type != 'system' && typeof conversation[i].datetime != 'undefined') {
                 return conversation[i];
             }
@@ -208,9 +224,9 @@ define('sum-backend-helpers', Class.extend({
      * generates new guid for messages
      * @returns {string} unique id as string
      */
-    genereateGUID: function(){
-        var guid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-            var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+    genereateGUID: function () {
+        var guid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
         return guid;
@@ -222,7 +238,7 @@ define('sum-backend-helpers', Class.extend({
      * @param current (string) version
      * @param given (string) version
      */
-    isVersionNewer: function(current, given) {
+    isVersionNewer: function (current, given) {
         // wrong format? return false
         if (given.search(/^\d+\.\d+\.\d+$/) == -1)
             return false;
@@ -237,27 +253,27 @@ define('sum-backend-helpers', Class.extend({
 
         // convert to int
         var i;
-        for(i=0; i<currentVersion.length; i++)
+        for (i = 0; i < currentVersion.length; i++)
             currentVersion[i] = parseInt(currentVersion[i]);
-        for(i=0; i<givenVersion.length; i++)
+        for (i = 0; i < givenVersion.length; i++)
             givenVersion[i] = parseInt(givenVersion[i]);
 
         // compare
         return currentVersion[1] == givenVersion[1] && currentVersion[2] == givenVersion[2] && currentVersion[3] < givenVersion[3] ||
-               currentVersion[1] == givenVersion[1] && currentVersion[2] < givenVersion[2] ||
-               currentVersion[1] < givenVersion[1];
+            currentVersion[1] == givenVersion[1] && currentVersion[2] < givenVersion[2] ||
+            currentVersion[1] < givenVersion[1];
     },
 
-    
+
     /**
      * get room in list
      * @return (boolean|object) false or room object
      * @param list (array) of rooms
      * @param room (string) roomname
      */
-    getRoom: function(list, room) {
+    getRoom: function (list, room) {
         var found = false;
-        $.each(list, function(index, value) {
+        $.each(list, function (index, value) {
             if (value.name === room) {
                 found = value;
                 return false;
@@ -273,7 +289,7 @@ define('sum-backend-helpers', Class.extend({
      * @param width (int) windows width
      * @param height (int) windows height
      */
-    openGameWindow: function(game, width, height) {
+    openGameWindow: function (game, width, height) {
         gui.Window.open('../gamez/' + game + '/index.html', {
             position: 'center',
             width: typeof width === 'undefined' ? 700 : width,
@@ -283,14 +299,14 @@ define('sum-backend-helpers', Class.extend({
             frame: true
         });
     },
-    
-    
+
+
     /**
      * removes newlines and ---- BEGIN PUBLIC KEY -----...
      * @return (string) only base64 key
      * @param (string) key
      */
-    extractBase64Key: function(key) {
-        return key.replace(/(\-)+[^\-]+(\-)+/g, '').replace(/[^a-z0-9+/=]/gi,'');
+    extractBase64Key: function (key) {
+        return key.replace(/(\-)+[^\-]+(\-)+/g, '').replace(/[^a-z0-9+/=]/gi, '');
     }
 }));
